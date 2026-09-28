@@ -1,59 +1,83 @@
-pipeline {
-    agent any
+pipeline { 
+    agent any 
+ 
+    parameters { 
+        string( 
+            name: 'APP_PORT', 
+            defaultValue: '3000', 
+            description: 'Server Port' 
+        ) 
+    } 
+ 
+    environment { 
+        IMAGE_NAME = 'jenkins-demo-app' 
+    } 
+ 
+    stages { 
+        stage('Checkout') { 
+            steps { 
+                echo 'Checking Out Source Code From Git Repo' 
+            } 
+        } 
 
-    parameters {
-        string(
-            name: 'APP_PORT',
-            defaultValue: '3000',
-            description: 'Server Port'
-        )
-    }
+        stage('Check Docker') { 
+            steps { 
+                bat 'docker --version' 
+            } 
+        } 
 
-    environment {
-        IMAGE_NAME = 'jenkins-demo-app'
-    }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                echo 'Checking Out Source Code From Git Repo'
-            }
-        }
-        stage('Check Docker') {
-            steps {
-                bat 'docker --version'
-            }
-        }
-        stage('Dependencies') {
-            steps {
-                bat 'npm install'
-            }
-        }
-        stage('Test App') {
-            steps {
-                bat 'npm test'
-            }
-        }
-        stage('Build') {
-            steps {
-                bat 'docker build -t %IMAGE_NAME%:%BUILD_NUMBER% .'
-            }
-        }
-        stage('Run Container') {
-            steps {
+        stage('Dependencies') { 
+            steps { 
                 bat '''
-                    docker run -d --name node-app-%BUILD_NUMBER% -p %APP_PORT%:3000 %IMAGE_NAME%:%BUILD_NUMBER%
-                '''    
-            }
-        }
-        stage('Verify') {
-            steps {
-                bat '''
-                    echo App Deployed Successfully
-                    echo open http://localhost:%APP_PORT%
-                    docker ps
-                '''    
-            }
-        }
-    }
+                    echo ===== NODE =====
+                    node --version
+
+                    echo ===== NPM =====
+                    npm --version
+
+                    echo ===== WHERE NPM =====
+                    where npm
+
+                    echo ===== CURRENT DIRECTORY =====
+                    cd
+
+                    echo ===== FILES =====
+                    dir
+
+                    echo ===== NPM INSTALL =====
+                    npm install
+                '''
+            } 
+        } 
+
+        stage('Test App') { 
+            steps { 
+                bat 'npm test' 
+            } 
+        } 
+
+        stage('Build') { 
+            steps { 
+                bat 'docker build -t %IMAGE_NAME%:%BUILD_NUMBER% .' 
+            } 
+        } 
+
+        stage('Run Container') { 
+            steps { 
+                bat ''' 
+                    docker run -d --name node-app-%BUILD_NUMBER% -p %APP_PORT%:3000 %IMAGE_NAME%:%BUILD_NUMBER% 
+                '''     
+            } 
+        } 
+
+        stage('Verify') { 
+            steps { 
+                bat ''' 
+                    echo App Deployed Successfully 
+                    echo open http://localhost:%APP_PORT% 
+                    docker ps 
+                '''     
+            } 
+        } 
+    } 
 }
