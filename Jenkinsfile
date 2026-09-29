@@ -26,29 +26,23 @@ pipeline {
             } 
         } 
 
-        stage('Dependencies') { 
-            steps { 
-                bat '''
-                    echo ===== NODE =====
-                    node --version
+        stage('Dependencies') {
+            steps {
+               bat '''
+                echo ===== PIPELINE PATH =====
+                echo %PATH%
 
-                    echo ===== NPM =====
-                    npm --version
+                echo ===== SYSTEMROOT =====
+                echo %SYSTEMROOT%
 
-                    echo ===== WHERE NPM =====
-                    where npm
+                echo ===== NODE DIRECT PATH =====
+                "C:\\Program Files\\nodejs\\node.exe" --version
 
-                    echo ===== CURRENT DIRECTORY =====
-                    cd
-
-                    echo ===== FILES =====
-                    dir
-
-                    echo ===== NPM INSTALL =====
-                    npm install
-                '''
-            } 
-        } 
+                echo ===== NPM DIRECT PATH =====
+                "C:\\Program Files\\nodejs\\npm.cmd" --version
+               '''
+            }
+        }
 
         stage('Test App') { 
             steps { 
