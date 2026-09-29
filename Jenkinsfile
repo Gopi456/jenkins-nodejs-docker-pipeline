@@ -19,43 +19,26 @@ pipeline {
                 echo 'Checking Out Source Code From Git Repo' 
             } 
         } 
-
         stage('Check Docker') { 
             steps { 
                 bat 'docker --version' 
             } 
         } 
-
-        stage('Dependencies') {
-            steps {
-               bat '''
-                echo ===== PIPELINE PATH =====
-                echo %PATH%
-
-                echo ===== SYSTEMROOT =====
-                echo %SYSTEMROOT%
-
-                echo ===== NODE DIRECT PATH =====
-                "C:\\Program Files\\nodejs\\node.exe" --version
-
-                echo ===== NPM DIRECT PATH =====
-                "C:\\Program Files\\nodejs\\npm.cmd" --version
-               '''
-            }
-        }
-
+        stage('Dependencies') { 
+            steps { 
+                bat 'npm install' 
+            } 
+        } 
         stage('Test App') { 
             steps { 
                 bat 'npm test' 
             } 
         } 
-
         stage('Build') { 
             steps { 
                 bat 'docker build -t %IMAGE_NAME%:%BUILD_NUMBER% .' 
             } 
         } 
-
         stage('Run Container') { 
             steps { 
                 bat ''' 
@@ -63,7 +46,6 @@ pipeline {
                 '''     
             } 
         } 
-
         stage('Verify') { 
             steps { 
                 bat ''' 
